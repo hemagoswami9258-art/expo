@@ -1,29 +1,67 @@
----
-title: Next steps
-description: Develop, review, and submit your project.
-hideTOC: true
----
+// App.js - React Native Car Racing Game
+import React, { useState, useEffect } from 'react';
+import { View, Text, Button, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
 
-import { Terminal } from '~/ui/components/Snippet';
+const { width, height } = Dimensions.get('window');
 
-Here are next steps to continue building your app:
+export default function App() {
+    const [carPosition, setCarPosition] = useState(width / 2);
+    const [score, setScore] = useState(0);
+    const [gameRunning, setGameRunning] = useState(false);
 
-### Reset your project
+    useEffect(() => {
+        if (gameRunning) {
+            const interval = setInterval(() => {
+                setScore(prev => prev + 1);
+            }, 1000);
+            return () => clearInterval(interval);
+        }
+    }, [gameRunning]);
 
-You can remove the boilerplate code and start fresh with a new project. Run the following command to reset your project:
+    const moveLeft = () => {
+        setCarPosition(prev => Math.max(50, prev - 50));
+    };
 
-<Terminal cmd={['$ npm run reset-project']} />
+    const moveRight = () => {
+        setCarPosition(prev => Math.min(width - 50, prev + 50));
+    };
 
-This command will move the existing files in **app** to **app-example**, then create a new **app** directory with a new **index.tsx** file.
+    const startGame = () => {
+        setGameRunning(true);
+        setScore(0);
+    };
 
-### Develop, review, and deploy
+    return (
+        <View style={styles.container}>
+            <Text style={styles.score}>à¤¸à¥à¤•à¥‹à¤°: {score}</Text>
+            
+            <View style={styles.road}>
+                <View style={[styles.car, { left: carPosition }]} />
+            </View>
+            
+            <View style={styles.controls}>
+                <TouchableOpacity style={styles.button} onPress={moveLeft}>
+                    <Text style={styles.btnText}>â—€</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity style={styles.button} onPress={startGame}>
+                    <Text style={styles.btnText}>{gameRunning ? 'à¤°à¥à¤•à¥‡à¤‚' : 'à¤¶à¥à¤°à¥‚ à¤•à¤°à¥‡à¤‚'}</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity style={styles.button} onPress={moveRight}>
+                    <Text style={styles.btnText}>â–¶</Text>
+                </TouchableOpacity>
+            </View>
+        </View>
+    );
+}
 
-Learn how to develop by reading the docs in the Develop section. You'll learn how to create [UI elements](/develop/user-interface/splash-screen-and-app-icon/), add [unit tests](/develop/unit-testing/), include [native modules](/config-plugins/introduction/), and more.
-
-Once you've developed your app, you can share it with your teammates for [review](/review/overview).
-
-Finally, you can [build](/deploy/build-project/) and [submit](/deploy/submit-to-app-stores/) your project to the app stores.
-
-### Step-by-step guide
-
-For a guided, step-by-step walkthrough of building an app with Expo from start to finish, check out the [tutorial](/tutorial/introduction/).
+const styles = StyleSheet.create({
+    container: { flex: 1, backgroundColor: '#1a1a2e', alignItems: 'center', justifyContent: 'center' },
+    score: { fontSize: 24, color: 'white', marginBottom: 20 },
+    road: { width: width, height: height / 2, backgroundColor: '#333', position: 'relative' },
+    car: { width: 60, height: 100, backgroundColor: '#e94560', position: 'absolute', bottom: 20 },
+    controls: { flexDirection: 'row', gap: 20, marginTop: 20 },
+    button: { padding: 20, backgroundColor: '#e94560', borderRadius: 10 },
+    btnText: { color: 'white', fontSize: 20 }
+});
